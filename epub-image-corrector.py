@@ -12,7 +12,8 @@ from wand.image import Image
 
 def file_or_dir(string: str) -> str:
     """
-    Passes argument if it is a valid path to the .epub file or a directory.
+    Passes argument if it is a valid path
+    to the .epub file or a directory.
     """
     path = Path(string)
 
@@ -37,11 +38,11 @@ def profile(string: str) -> str:
         if path.suffix == '.icc':
             return string
         else:
-            raise FileNotFoundError(f"{string} is not a .icc file.")
+            raise argparse.ArgumentTypeError(f"{string} is not a .icc file.")
     else:
-        raise FileNotFoundError(
+        raise argparse.ArgumentTypeError(
             f"{string} is not a valid path to an .icc file."
-            f"\n{18 * ' '} Please specify a path to the .icc cmyk color "
+            f"\n\tPlease specify a path to the .icc cmyk color "
             "profile with -p option.")
 
 
@@ -54,39 +55,39 @@ def process_file(path: Path) -> int:
     with TemporaryDirectory() as tmp_dir:
         root_dir = Path(tmp_dir)
         if not is_zipfile(path):
-            print(f"error: {path.relative_to(root_dir)} "
-                  "is not a zip file, skipping.")
+            print(f"\nerror: {path} "
+                  "is not a zip file, skip.")
             return
-
-        time = timer()
-        with ZipFile(path, 'a') as archive:
+        with ZipFile(path) as archive:
             archive.extractall(root_dir)
-        print(f"zip extract: {timer() - time}")
-        if (Path(f"{root_dir}/mimetype").read_text()
-                != 'application/epub+zip'):
-            print(f"error: {path.relative_to(root_dir)} "
-                  "is not a application/epub+zip file, skipping.")
+        mimetype = Path(f"{root_dir}/mimetype")
+        if mimetype.is_file():
+            if mimetype.read_text() != 'application/epub+zip':
+                print(f"\nerror: {path} "
+                      "is not a application/epub+zip file, skip.")
+                return
+        else:
+            print(f"\nerror: {path} "
+                  "cannot check mimetype, file is "
+                  "probably corrupted, skip.")
             return
         files_changed = 0
         image_extensions = ['jpg', 'jpeg', 'png']
-        time = timer()
         for extension in image_extensions:
             for file in root_dir.glob(f"OEBPS/images/*.{extension}"):
                 with Image(filename=file) as img:
                     if (img.profiles['ICC'] == None
                             and img.colorspace == 'cmyk'):
                         files_changed += 1
-                        print(f"fixing: {file}")
                         with open(color_profile, 'rb') as profile:
                             img.profiles['ICC'] = profile.read()
                         img.save(filename=str(file))
-        print(f"file correction: {timer() - time}")
-        time = timer()
         if files_changed > 0:
+            # TODO: add try catch, if error then recover original file
             with ZipFile(path, 'w') as epub:
                 for file in root_dir.rglob('*'):
                     epub.write(file, arcname=file.relative_to(root_dir))
-        print(f"file write: {timer() - time}")
+            print(f"\nfile corrected: {path}")
         return files_changed
 
 
@@ -109,7 +110,7 @@ if __name__ == '__main__':
 
     changed_images = 0
     files = 0
-    time = timer()
+    start_time = timer()
 
     if work_path.is_file():
         changed_images = process_file(work_path)
@@ -118,18 +119,21 @@ if __name__ == '__main__':
         work_files = list(work_path.glob(
             f"{'**/' if args.recursive else ''}*.epub"))
 
-        bar = Bar('Processing files:', max=len(work_files))
+        bar = Bar('Processing files:', max=len(work_files),
+                  suffix='%(index)d/%(max)d (%(percent)d%%) - '
+                  '[%(eta_td)s / %(elapsed_td)s]')
 
         for file in work_files:
             bar.next()
 
-            images_changed = process_file(file)
+            images_changed = process_file(file) or 0
             changed_images += images_changed
             files += 1 if images_changed > 0 else 0
 
         bar.finish()
 
-    elapsed_time = timer() - time
+    elapsed_time = timer() - start_time
 
-    print(f"Changed {changed_images} images inside {files} "
-          f"{'files' if files > 1 else 'file'} in {'%.3f'%(elapsed_time)}s.")
+    print(f"Corrected {changed_images} {'images' if files > 1 else 'image'} "
+          f"inside {files} {'files' if files > 1 else 'file'} "
+          f"in {'%.1f'%(elapsed_time)}s.")
