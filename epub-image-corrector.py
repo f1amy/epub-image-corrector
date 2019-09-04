@@ -4,7 +4,7 @@ import argparse
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from timeit import default_timer as timer
-from zipfile import ZipFile, is_zipfile
+from zipfile import ZIP_DEFLATED, ZipFile, is_zipfile
 
 from progress.bar import Bar
 from wand.image import Image
@@ -84,7 +84,8 @@ def process_file(path: Path) -> int:
                         img.save(filename=str(file))
         if files_changed > 0:
             # TODO: add try catch, if error then recover original file
-            with ZipFile(path, 'w') as epub:
+            with ZipFile(path, mode='w', compression=ZIP_DEFLATED,
+                         compresslevel=9) as epub:
                 for file in root_dir.rglob('*'):
                     epub.write(file, arcname=file.relative_to(root_dir))
             print(f"\nfile corrected: {path}")
