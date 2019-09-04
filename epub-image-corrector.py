@@ -84,8 +84,7 @@ def process_file(path: Path) -> int:
                         img.save(filename=str(file))
         if files_changed > 0:
             # TODO: add try catch, if error then recover original file
-            with ZipFile(path, mode='w', compression=ZIP_DEFLATED,
-                         compresslevel=9) as epub:
+            with ZipFile(path, mode='w', compression=ZIP_DEFLATED) as epub:
                 for file in root_dir.rglob('*'):
                     epub.write(file, arcname=file.relative_to(root_dir))
             print(f"\nfile corrected: {path}")
