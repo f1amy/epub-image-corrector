@@ -77,7 +77,9 @@ def process_file(path: Path) -> int:
             for file in root_dir.glob(f"OEBPS/images/*.{extension}"):
                 with Image(filename=file) as img:
                     if (img.profiles['ICC'] == None
-                            and img.colorspace == 'cmyk'):
+                            and img.colorspace == 'cmyk'
+                            or img.colorspace == 'cmyk'
+                            and args.force):
                         files_changed += 1
                         with open(color_profile, 'rb') as profile:
                             img.profiles['ICC'] = profile.read()
@@ -96,12 +98,16 @@ if __name__ == '__main__':
         description='Correct images inside .epub files with CMYK color space '
                     'and without profiles.')
     parser.add_argument('path', type=file_or_dir,
-                        help='Path to .epub file or directory for image correcting.')
+                        help='Path to .epub file or directory '
+                        'for image correcting.')
     parser.add_argument('-r', '--recursive', action='store_true',
                         help='Recursive into subdirectories.')
     parser.add_argument('-p', '--profile', type=profile, required=True,
                         help='Path to .icc cmyk profile, '
                         'defaults to cmyk.icc in current directory.')
+    parser.add_argument('-f', '--force', action='store_true',
+                        help='Force replace color profile for '
+                        'cmyk color space images.')
 
     args = parser.parse_args()
 
@@ -113,6 +119,7 @@ if __name__ == '__main__':
     start_time = timer()
 
     if work_path.is_file():
+        print('Correcting 1 file...')
         changed_images = process_file(work_path)
         files = 1 if changed_images > 0 else 0
     else:
@@ -134,6 +141,6 @@ if __name__ == '__main__':
 
     elapsed_time = timer() - start_time
 
-    print(f"Corrected {changed_images} {'images' if files > 1 else 'image'} "
+    print(f"Corrected {changed_images} {'images' if changed_images > 1 else 'image'} "
           f"inside {files} {'files' if files > 1 else 'file'} "
           f"in {'%.1f'%(elapsed_time)}s.")
