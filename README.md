@@ -4,7 +4,7 @@ A Python script that is correcting wrong colors of images inside ePub files with
 
 ## About
 
-Someday when starting reading an .epub eBook it got wrong colors for like 75% of pages.
+Someday when I was starting reading an .epub eBook it got wrong colors for like 75% of pages.
 
 The investigation concludes that the publisher is messed up when compiling content into an eBook with images color space and color profiles.
 
