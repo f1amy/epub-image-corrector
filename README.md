@@ -4,9 +4,9 @@ A Python script that is correcting wrong colors of images inside ePub files with
 
 ## About
 
-Someday when starting reading the .epub eBook it got wrong colors for like 60% of pages.
+Someday when starting reading an .epub eBook it got wrong colors for like 75% of pages.
 
-The investigation comes to an conclusion that the publisher is messed up when compiling content into a eBook with images color space and color profiles.
+The investigation concludes that the publisher is messed up when compiling content into an eBook with images color space and color profiles.
 
 The problem is that most ePub readers (that are probably browsers) can't properly display an CMYK image without color profile (but Microsoft Edge can).
 
