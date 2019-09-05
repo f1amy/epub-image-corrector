@@ -42,7 +42,7 @@ def profile(string: str) -> str:
     else:
         raise argparse.ArgumentTypeError(
             f"{string} is not a valid path to an .icc file."
-            f"\n\tPlease specify a path to the .icc cmyk color "
+            f"\n\tPlease specify a path to the .icc CMYK color "
             "profile with -p option.")
 
 
@@ -85,7 +85,8 @@ def process_file(path: Path) -> int:
                             img.profiles['ICC'] = profile.read()
                         img.save(filename=str(file))
         if files_changed > 0:
-            # TODO: add try catch, if error then recover original file
+            # TODO: add try except in case of error here
+            # TODO: to be able to recover original file
             with ZipFile(path, mode='w', compression=ZIP_DEFLATED) as epub:
                 for file in root_dir.rglob('*'):
                     epub.write(file, arcname=file.relative_to(root_dir))
@@ -95,24 +96,23 @@ def process_file(path: Path) -> int:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description='Correct images inside .epub files with CMYK color space '
-                    'and without profiles.')
+        description='Correct images inside ePub files with CMYK color space '
+                    'and without color profiles.')
+    parser.add_argument('profile', type=profile,
+                        help='Path to .icc CMYK profile.')
     parser.add_argument('path', type=file_or_dir,
                         help='Path to .epub file or directory '
-                        'for image correcting.')
+                        'that contains ePub files.')
     parser.add_argument('-r', '--recursive', action='store_true',
                         help='Recursive into subdirectories.')
-    parser.add_argument('-p', '--profile', type=profile, required=True,
-                        help='Path to .icc cmyk profile, '
-                        'defaults to cmyk.icc in current directory.')
     parser.add_argument('-f', '--force', action='store_true',
                         help='Force replace color profile for '
-                        'cmyk color space images.')
+                        'CMYK color space images.')
 
     args = parser.parse_args()
 
-    work_path = Path(args.path)
     color_profile = Path(args.profile)
+    work_path = Path(args.path)
 
     changed_images = 0
     files = 0
@@ -141,6 +141,7 @@ if __name__ == '__main__':
 
     elapsed_time = timer() - start_time
 
-    print(f"Corrected {changed_images} {'images' if changed_images > 1 else 'image'} "
+    print(f"Corrected {changed_images} "
+          f"{'images' if changed_images > 1 else 'image'} "
           f"inside {files} {'files' if files > 1 else 'file'} "
           f"in {'%.1f'%(elapsed_time)}s.")
