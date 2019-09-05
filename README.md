@@ -12,6 +12,34 @@ The problem is that most ePub readers (that are probably browsers) can't properl
 
 Fixing ePubs manually would be very long, also when you don't know which of them corrupted. That's where this scripts comes in.
 
+## Installation
+
+In order to launch the script you will need a Python interpreter installed on your system, instructions can be found [there](https://www.python.org/downloads/).
+
+In addition to interpreter you must also install dependencies using this command:
+
+```bash
+pip3 install -r requirements.txt
+```
+
+The script is tested on Python 3.6.8 and should work on both Linux and Windows.
+
+## Requirement
+
+For legal reasons, a color profile isn't included out of the box.
+Thus, in order to work, you must download it yourself. I tested some of these:
+
+* JapanColor2001Coated.icc
+* Photoshop5DefaultCMYK.icc
+* USWebCoatedSWOP.icc
+* UncoatedFOGRA29.icc
+
+The best experience I had was with `USWebCoatedSWOP.icc` profile.
+
+It doesn't mean that you'll have the same experience with your files, so it is worth to try other profiles.
+
+You could download some profiles from Adobe ([link for win](https://www.adobe.com/support/downloads/iccprofiles/iccprofiles_win.html)) or color.org ([link](http://www.color.org/registry/index.xalter)).
+
 ## Usage
 
 ```bash
@@ -30,32 +58,6 @@ optional arguments:
   -r, --recursive  Recursive into subdirectories.
   -f, --force      Force replace color profile for CMYK color space images.
 ```
-
-## Requirements
-
-For legal reasons, a color profile isn't included out of the box.
-Thus, in order to work, you must download it yourself. I tested some of these:
-
-* JapanColor2001Coated.icc
-* Photoshop5DefaultCMYK.icc
-* USWebCoatedSWOP.icc
-* UncoatedFOGRA29.icc
-
-The best experience I had was with `USWebCoatedSWOP.icc` profile.
-
-It doesn't mean that you'll have the same experience with your files, so it is worth to try other profiles.
-
-You could download some profiles from Adobe ([link for win](https://www.adobe.com/support/downloads/iccprofiles/iccprofiles_win.html)) or color.org ([link](http://www.color.org/registry/index.xalter)).
-
-Also you will need a Python interpreter installed on your system, instructions can be found [here](https://www.python.org/downloads/).
-
-In addition to interpreter you must also install dependencies using this command:
-
-```bash
-pip3 install -r requirements.txt
-```
-
-The script is tested on Python 3.6.8 and should work on both Linux and Windows.
 
 ## Examples
 
