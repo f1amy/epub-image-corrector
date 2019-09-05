@@ -67,7 +67,7 @@ optional arguments:
 ./epub-image-corrector.py /profiles/some-profile.icc /books/comics/some-comic.epub
 ```
 
-### For single file force replace profile
+### For single file with force replace profile
 
 ```bash
 ./epub-image-corrector.py /profiles/some-profile.icc /books/study/some-book.epub -f
