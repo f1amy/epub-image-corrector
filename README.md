@@ -1,12 +1,12 @@
-# Epub image corrector
+# ePub Image Corrector
 
 A Python script that is correcting wrong colors of images inside ePub files with CMYK color space and without color profiles.
 
 ## About
 
-Someday when I was starting reading an .epub eBook it got wrong colors for like 75% of pages.
+Someday when I was starting reading an ePub eBook it got wrong colors for like 75% of pages.
 
-The investigation concludes that the publisher is messed up when compiling content into an eBook with images color space and color profiles.
+The investigation concludes that the publisher messed up when compiling content into an eBook with images color space and color profiles.
 
 The problem is that most ePub readers (that are probably browsers) can't properly display an CMYK image without color profile (but Microsoft Edge can).
 
@@ -22,7 +22,7 @@ In addition to interpreter you must also install dependencies using this command
 pip3 install -r requirements.txt
 ```
 
-The script is tested on Python 3.6.8 and should work on both Linux and Windows.
+The script tested on Python 3.6 and should work on both Linux and Windows.
 
 ## Requirement
 
@@ -38,7 +38,7 @@ The best experience I had was with `USWebCoatedSWOP.icc` profile.
 
 It doesn't mean that you'll have the same experience with your files, so it is worth to try other profiles.
 
-You could download some profiles from Adobe ([link for win](https://www.adobe.com/support/downloads/iccprofiles/iccprofiles_win.html)) or color.org ([link](http://www.color.org/registry/index.xalter)).
+You could download some profiles from Adobe ([link for Windows](https://www.adobe.com/support/downloads/iccprofiles/iccprofiles_win.html)) or color.org ([link](http://www.color.org/registry/index.xalter)).
 
 ## Usage
 

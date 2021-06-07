@@ -13,7 +13,7 @@ from wand.image import Image
 def file_or_dir(string: str) -> str:
     """
     Passes argument if it is a valid path
-    to the .epub file or a directory.
+    to the ePub file or a directory.
     """
     path = Path(string)
 
@@ -48,7 +48,7 @@ def profile(string: str) -> str:
 
 def process_file(path: Path) -> int:
     """
-    Correct images inside .epub file.\n
+    Correct images inside ePub file.\n
     File is overwritten only if at least one image is corrected.\n
     Returns number of changed images inside file.
     """
@@ -64,7 +64,7 @@ def process_file(path: Path) -> int:
         if mimetype.is_file():
             if mimetype.read_text() != 'application/epub+zip':
                 print(f"\nerror: {path} "
-                      "is not a application/epub+zip file, skip.")
+                      "is not an application/epub+zip file, skip.")
                 return 0
         else:
             print(f"\nerror: {path} "
@@ -74,22 +74,22 @@ def process_file(path: Path) -> int:
         files_changed = 0
         image_extensions = ['jpg', 'jpeg', 'png']
         for extension in image_extensions:
-            for file in root_dir.glob(f"OEBPS/images/*.{extension}"):
-                with Image(filename=file) as img:
-                    if (img.profiles['ICC'] is None
-                            and img.colorspace == 'cmyk'
-                            or img.colorspace == 'cmyk'
+            for image_path in root_dir.glob(f"OEBPS/images/*.{extension}"):
+                with Image(filename=image_path) as image:
+                    if (image.profiles['ICC'] is None
+                            and image.colorspace == 'cmyk'
+                            or image.colorspace == 'cmyk'
                             and args.force):
                         files_changed += 1
-                        with open(color_profile, 'rb') as profile:
-                            img.profiles['ICC'] = profile.read()
-                        img.save(filename=str(file))
+                        with open(color_profile, 'rb') as image_profile:
+                            image.profiles['ICC'] = image_profile.read()
+                        image.save(filename=str(image_path))
         if files_changed > 0:
             # TODO: add try except in case of error here
             # TODO: to be able to recover original file
             with ZipFile(path, mode='w', compression=ZIP_DEFLATED) as epub:
-                for file in root_dir.rglob('*'):
-                    epub.write(file, arcname=file.relative_to(root_dir))
+                for image_path in root_dir.rglob('*'):
+                    epub.write(image_path, arcname=image_path.relative_to(root_dir))
             print(f"\nfile corrected: {path}")
         return files_changed
 
@@ -119,7 +119,7 @@ if __name__ == '__main__':
     start_time = timer()
 
     if work_path.is_file():
-        print('Correcting 1 file...')
+        print('Correcting one file...')
         changed_images = process_file(work_path) or 0
         files = 1 if changed_images > 0 else 0
     else:

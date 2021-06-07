@@ -1,2 +1,4 @@
-color-profiles/*
-test-files/*
+/.idea
+/venv
+/color-profiles
+/test-files
